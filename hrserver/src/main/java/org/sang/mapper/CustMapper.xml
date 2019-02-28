@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.sang.mapper.CustMapper">
+       
+    <sql id="columns">
+	    <![CDATA[
+			id,provience,company,nm,mobile,tele,position,isExport,isDel,dt_created,dt_updated,created_by,updated_by,version
+	    ]]>
+	</sql>
+    
+    <insert id="addCust">
+    	insert into cust(
+    		<include refid="columns"></include>
+    	) values(#{id},#{provience},#{company},#{nm},#{mobile},#{tele},#{position},#{isExport},#{isDel},#{dtCreated},#{dtUpdated},#{createdBy},#{updatedBy},#{version})
+    </insert>
+    
+    <select id="getCusts" resultType="org.sang.bean.Cust">
+    	SELECT *,(CASE isExport
+			WHEN 'Y' THEN
+				1
+			ELSE
+				0
+		END ) order_export
+    	FROM cust 
+    	<where>
+    		<if test="ids != null and ids.size()>0">
+    			id in (
+    			<foreach collection="ids" index="index" separator="," item="item">
+    				#{item}
+    			</foreach>
+    			)
+    		</if>
+    		<if test="provience != null and provience != ''">
+    			AND provience like concat('%',#{provience},'%')
+    		</if>
+    		<if test="company != null and company != ''">
+    			AND company like concat('%',#{company},'%')
+    		</if>
+    		<if test="nm != null and nm != ''">
+    			AND nm like concat('%',#{nm},'%')
+    		</if>
+    		<if test="mobile != null and mobile != ''">
+    			AND mobile like concat('%',#{mobile},'%')
+    		</if>
+    		<if test="tele != null and tele != ''">
+    			AND tele like concat('%',#{tele},'%')
+    		</if>
+    		<if test="position != null and position != ''">
+    			AND position like concat('%',#{position},'%')
+    		</if>
+    		<if test="isExport != null and isExport != ''">
+    			AND isExport = #{isExport}
+    		</if>
+    	</where>
+    	ORDER BY order_export,dt_created desc 
+    </select>
+    
+    <insert id="insertList">
+    	INSERT INTO cust(
+    		<include refid="columns"></include>
+    	) VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.id},#{item.provience},#{item.company},#{item.nm},#{item.mobile},#{item.tele},#{item.position},'N','N',#{item.dtCreated},#{item.dtUpdated},#{item.createdBy},#{item.updatedBy},0
+			)
+		</foreach>
+    </insert>
+    
+    <update id="updateExportMark">
+    	UPDATE cust SET isExport='Y' WHERE id IN (
+    	<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item}
+			)
+		</foreach>
+    	)
+    </update>
+</mapper>
