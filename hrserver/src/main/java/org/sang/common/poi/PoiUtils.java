@@ -142,7 +142,7 @@ public class PoiUtils {
           if (row == null) {
             continue;// 没数据
           }
-          int physicalNumberOfCells = row.getPhysicalNumberOfCells();
+          short physicalNumberOfCells = row.getLastCellNum();
           cust = new Cust();
           for (int k = 0; k < physicalNumberOfCells; k++) {
             HSSFCell cell = row.getCell(k);
@@ -164,10 +164,10 @@ public class PoiUtils {
                     cust.setCompany(cellValue);
                     break;
                   case 3:
-                    cust.setNm(cellValue);
+                    cust.setNm(cellValue.trim());
                     break;
                   case 4:
-                    cust.setMobile(cellValue);
+                    cust.setMobile(cellValue.trim());
                     break;
                   case 5:
                     cust.setTele(cellValue);
